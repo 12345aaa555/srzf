@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生日祝福</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Microsoft Yahei", sans-serif;
+            background-color: #f8bbd0;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+        .page {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.8s ease-in-out;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        .page-1 {
+            transform: translateX(0);
+        }
+        .page-2, .page-3, .page-4, .page-5, .page-6, .page-7, .page-8 {
+            transform: translateX(100%);
+        }
+        .active {
+            transform: translateX(0) !important;
+        }
+        .hidden {
+            transform: translateX(-100%) !important;
+        }
+        .title {
+            font-size: 2.5rem;
+            color: #fff;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            width: 100%;
+            max-width: 350px;
+        }
+        .input-group input {
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.3);
+            color: #fff;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+        .input-group input::placeholder {
+            color: #fff;
+            opacity: 0.8;
+        }
+        .btn {
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 8px;
+            background-color: #fff;
+            color: #f8bbd0;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .video-container {
+            width: 20rem;
+            height: auto;
+            margin-bottom: 1.5rem;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        }
+        .video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .text-group {
+            max-width: 90%;
+            text-align: center;
+            color: #fff;
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+        .btn-group {
+            display: flex;
+            gap: 2rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .btn-style {
+            padding: 0.8rem 2rem;
+            border: 2px solid #fff;
+            border-radius: 25px;
+            background-color: transparent;
+            color: #fff;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        .btn-style:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+        .card-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            width: 100%;
+        }
+        .card {
+            background-color: rgba(255, 255, 255, 0.25);
+            padding: 1.5rem;
+            border-radius: 12px;
+            max-width: 22rem;
+            text-align: center;
+            color: #fff;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+            transition: all 0.5s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            position: absolute;
+            visibility: hidden;
+        }
+        .card.active {
+            opacity: 1;
+            transform: translateY(0);
+            position: relative;
+            visibility: visible;
+        }
+        .card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+        .card p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        .img-avatar {
+            width: 160px;
+            height: 160px;
+            object-fit: contain;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .img-cat {
+            width: 180px;
+            height: auto;
+            margin: 0 auto 1rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .img-cake {
+            width: 220px;
+            height: auto;
+            margin: 0 auto 1rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .img-card {
+            width: 14rem;
+            height: auto;
+            margin-bottom: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .footer {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            color: #fff;
+            font-size: 1rem;
+        }
+        .hint {
+            position: absolute;
+            bottom: 2rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+            text-align: center;
+            width: 100%;
+            padding: 0 1rem;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2rem;
+            }
+            .card {
+                max-width: 90%;
+                padding: 1.2rem;
+            }
+            .card h3 {
+                font-size: 1.6rem;
+            }
+            .card p {
+                font-size: 1.1rem;
+            }
+            .img-avatar {
+                width: 140px;
+                height: 140px;
+            }
+            .img-cat {
+                width: 160px;
+            }
+            .img-cake {
+                width: 200px;
+            }
+            .img-card {
+                width: 12rem;
+            }
+            .video-container {
+                width: 18rem;
+            }
+            .btn-group {
+                gap: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .title {
+                font-size: 1.8rem;
+            }
+            .card {
+                max-width: 95%;
+                padding: 1rem;
+            }
+            .card h3 {
+                font-size: 1.5rem;
+            }
+            .card p {
+                font-size: 1rem;
+            }
+            .img-avatar {
+                width: 120px;
+                height: 120px;
+            }
+            .img-cat {
+                width: 140px;
+            }
+            .img-cake {
+                width: 180px;
+            }
+            .img-card {
+                width: 10rem;
+            }
+            .video-container {
+                width: 16rem;
+            }
+        }
+        
+        /* 彩蛋样式 */
+        .egg {
+            cursor: pointer;
+            color: #ffeb3b;
+            text-decoration: underline;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        /* 卡片导航 */
+        .card-nav {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
+        }
+        .card-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .card-dot.active {
+            background-color: #fff;
+            transform: scale(1.2);
+        }
+        
+        /* 页面标题样式 */
+        .page-title {
+            font-size: 2.2rem;
+            color: #fff;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <audio id="birthdaySong" loop>
+        <source src="M500003gdyar2C1ukx.mp3" type="audio/mpeg">
+        您的浏览器不支持音频播放。
+    </audio>
+
+    <!-- 页面1：登录页 -->
+    <div class="page page-1 active">
+        <div class="title">生日快乐</div>
+        <div class="input-group">
+            <input type="text" placeholder="某某某" id="nameInput">
+            <input type="password" placeholder="密码" id="passwordInput">
+        </div>
+        <button class="btn" id="enterBtn">进入</button>
+        <div class="hint">请输入姓名和密码进入祝福页面</div>
+    </div>
+
+    <!-- 页面2：生日蛋糕页 -->
+    <div class="page page-2">
+        <div class="video-container">
+            <video id="birthdayVideo" autoplay muted loop playsinline>
+                <source src="img/789.mp4" type="video/mp4">
+                您的浏览器不支持HTML5视频播放。
+            </video>
+        </div>
+        <h2 class="page-title">Happy Birthday</h2>
+        <div class="btn-group">
+            <button class="btn-style" id="likeBtn">喜欢</button>
+            <button class="btn-style" id="dislikeBtn">我不喜欢</button>
+        </div>
+        <div class="hint">点击按钮继续</div>
+    </div>
+
+    <!-- 页面3：祝福内容页 -->
+    <div class="page page-3">
+        <h2 class="page-title">美好祝愿</h2>
+        <div class="card-group">
+            <div class="card active">
+                <h3>愿你</h3>
+                <p>永远带着少年的热烈和勇敢，在青春里闪闪发光，自在生长！</p>
+            </div>
+            <div class="card">
+                <h3>愿你</h3>
+                <p>学业顺遂，快乐满格，每天都能收获甜甜的小幸运！</p>
+            </div>
+            <div class="card">
+                <h3>相遇</h3>
+                <p>我不是在最好的时光遇见了你，而是遇见了你才开始了我这段最好的时光。承蒙时光不弃，感谢相遇。</p>
+            </div>
+        </div>
+        <div class="card-nav" id="cardNav3"></div>
+        <div class="hint">点击任意位置继续</div>
+    </div>
+
+    <!-- 页面4：祝福卡片页 -->
+    <div class="page page-4">
+        <h2 class="page-title">特别祝福</h2>
+        <div class="card-group">
+            <div class="card active">
+                <div class="text-group">Happy Birthday</div>
+                <img src="img/1.jpg" alt="趣味头像" class="img-avatar">
+                <p>今天的我又是如此迷人</p>
+            </div>
+            <div class="card">
+                <div class="text-group">Happy Birthday</div>
+                <p>小寿星</p>
+                <p>祝你所有的希望都能如愿</p>
+                <p>所有的梦想都能实现</p>
+                <p>所有的期待都能出现</p>
+                <p>所有的付出都能兑现在你生日来临之即。</p>
+                <img src="img/2.jpg" alt="趣味头像" class="img-avatar">
+                <p>今天的我又是如此迷人</p>
+            </div>
+        </div>
+        <div class="card-nav" id="cardNav4"></div>
+        <div class="hint">点击任意位置继续</div>
+    </div>
+
+    <!-- 页面5：祝福卡片页 -->
+    <div class="page page-5">
+        <h2 class="page-title">快乐祝福</h2>
+        <div class="card-group">
+            <div class="card active">
+                <div class="text-group">Happy Birthday</div>
+                <p>祝你</p>
+                <img src="img/3.jpg" alt="猫咪图片" class="img-cat">
+            </div>
+            <div class="card">
+                <h3>百事可乐</h3>
+                <p>万事芬达，天天娃哈哈，月月乐百事</p>
+                <img src="img/4.jpg" alt="趣味图片" class="img-avatar">
+            </div>
+            <div class="card">
+                <h3>年年高乐高</h3>
+                <p>心情似雪碧，永远心飞扬</p>
+                <img src="img/5.jpg" alt="趣味图片" class="img-avatar">
+            </div>
+        </div>
+        <div class="card-nav" id="cardNav5"></div>
+        <div class="hint">点击任意位置继续</div>
+    </div>
+
+    <!-- 页面6：祝福卡片页 -->
+    <div class="page page-6">
+        <h2 class="page-title">美好心愿</h2>
+        <div class="card-group">
+            <div class="card active">
+                <div class="text-group">Happy Birthday</div>
+                <h3>愿你</h3>
+                <p>贪吃不胖，深情不负，傻人傻福，一直幸运。一生努力，一生被爱，想要的都拥有，得不到的都释怀。</p>
+                <img src="img/微信图片_20251122134148_40_30.jpg" alt="蛋糕图片" class="img-cake">
+            </div>
+            <div class="card">
+                <h3>今晚的星星</h3>
+                <p>只有十五颗颗，我是说，当你数到第二十三颗就把眼睛闭上，你会看到我为你点亮的蜡烛。许个愿望吧</p>
+                <img src="img/6.jpg" alt="趣味图片" class="img-avatar">
+                <p class="egg" id="eggTrigger">点击有彩蛋</p>
+            </div>
+        </div>
+        <div class="card-nav" id="cardNav6"></div>
+        <div class="hint">点击任意位置继续</div>
+    </div>
+
+    <!-- 页面7：祝福卡片页 -->
+    <div class="page page-7">
+        <h2 class="page-title">温馨祝福</h2>
+        <div class="card-group">
+            <div class="card active">
+                <div class="text-group">Happy Birthday</div>
+                <p>👑美好的祝福送给你</p>
+                <p>🎁愿所行皆坦途，所遇皆温暖，所念皆如愿，未来皆可期，多喜乐，常安宁!</p>
+                <p>🥂愿你踏平坎坷，一往无前，愿你满腔热血，奔赴远方，前程似锦，来日方长。</p>
+                <p>🎈望你平安快乐，愿您想要的都得到，得到的都美好，岁月静好，安暖相伴！</p>
+                <p>🍭 愿你成为自己喜欢的样子，不抱怨，不将就，有自由，有光芒。</p>
+                <p>🍰愿你一切尽意，百事从欢，愿你心中无尘，只有愉悦和清风。</p>
+                <p>❤️生日快乐！愿天天快乐不止生日，有趣有盼，不负心中热爱。</p>
+                <img src="img/7.jpg" alt="趣味头像" class="img-card">
+                <p>今天的我又是如此迷人</p>
+            </div>
+            <div class="card">
+                <div class="text-group">Happy Birthday</div>
+                <p>Hi！ Hi！</p>
+                <p>今天是你的生日！</p>
+                <p>在这个时刻，</p>
+                <p>首先送上我的祝福，希望2020身体健康，所有的烦恼统统全忘掉。</p>
+                <p>新的一年里，希望每天都能开开心心，吃特别多的好吃的，咋吃都不胖，</p>
+                <p>去特别多好玩的地方，咋玩都不会累。嘻嘻</p>
+                <p>乖，摸摸头。</p>
+            </div>
+        </div>
+        <div class="card-nav" id="cardNav7"></div>
+        <div class="hint">点击任意位置继续</div>
+    </div>
+
+    <!-- 页面8：特别惊喜页 -->
+    <div class="page page-8">
+        <div class="title">特别惊喜</div>
+        <div class="video-container">
+            <video id="specialVideo" autoplay controls loop playsinline>
+                <source src="img/888888.mp4" type="video/mp4">
+                您的浏览器不支持HTML5视频播放。
+            </video>
+        </div>
+        <div class="text-group">
+            <p>希望这个特别的视频能给你带来欢乐</p>
+        </div>
+        <div class="hint">祝福到此结束，感谢您的观看！</div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        const totalPages = 8;
+        const audio = document.getElementById('birthdaySong');
+        let audioStarted = false;
+        
+        // 存储每个页面的卡片状态
+        const cardStates = {};
+        
+        // 初始化卡片状态
+        function initCardStates() {
+            for (let i = 3; i <= 7; i++) {
+                const cards = document.querySelectorAll(`.page-${i} .card`);
+                cardStates[i] = {
+                    currentIndex: 0,
+                    totalCards: cards.length
+                };
+                
+                // 创建卡片导航点
+                createCardNav(i, cards.length);
+            }
+        }
+        
+        // 创建卡片导航点
+        function createCardNav(pageNum, cardCount) {
+            const navContainer = document.getElementById(`cardNav${pageNum}`);
+            if (!navContainer) return;
+            
+            navContainer.innerHTML = '';
+            for (let i = 0; i < cardCount; i++) {
+                const dot = document.createElement('div');
+                dot.className = `card-dot ${i === 0 ? 'active' : ''}`;
+                dot.dataset.index = i;
+                navContainer.appendChild(dot);
+            }
+        }
+        
+        // 显示指定页面的指定卡片
+        function showCard(pageNum, cardIndex) {
+            const cards = document.querySelectorAll(`.page-${pageNum} .card`);
+            const dots = document.querySelectorAll(`#cardNav${pageNum} .card-dot`);
+            
+            // 隐藏所有卡片
+            cards.forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            // 显示指定卡片
+            if (cards[cardIndex]) {
+                cards[cardIndex].classList.add('active');
+            }
+            
+            // 更新导航点状态
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === cardIndex);
+            });
+            
+            // 更新卡片状态
+            cardStates[pageNum].currentIndex = cardIndex;
+        }
+        
+        // 显示下一张卡片
+        function showNextCard(pageNum) {
+            const state = cardStates[pageNum];
+            if (state.currentIndex < state.totalCards - 1) {
+                showCard(pageNum, state.currentIndex + 1);
+                return true; // 还有更多卡片
+            }
+            return false; // 没有更多卡片
+        }
+
+        // 页面切换函数
+        function switchPage() {
+            if (currentPage < totalPages) {
+                const current = document.querySelector(`.page-${currentPage}`);
+                const next = document.querySelector(`.page-${currentPage + 1}`);
+                current.classList.remove('active');
+                current.classList.add('hidden');
+                next.classList.add('active');
+                currentPage++;
+                
+                // 如果音乐还没开始，尝试播放
+                if (!audioStarted) {
+                    startAudio();
+                }
+            }
+        }
+
+        // 启动音频播放
+        function startAudio() {
+            if (audioStarted) return;
+            
+            audio.play().then(() => {
+                audioStarted = true;
+                console.log("音乐开始播放");
+            }).catch(error => {
+                console.log("音乐播放失败:", error);
+            });
+        }
+
+        // 绑定按钮事件
+        document.getElementById('enterBtn').addEventListener('click', function() {
+            const name = document.getElementById('nameInput').value;
+            const password = document.getElementById('passwordInput').value;
+            
+            // 简单的验证
+            if (name && password) {
+                switchPage();
+                // 开始播放音乐
+                startAudio();
+            } else {
+                alert('请输入姓名和密码');
+            }
+        });
+        
+        document.getElementById('likeBtn').addEventListener('click', switchPage);
+        document.getElementById('dislikeBtn').addEventListener('click', switchPage);
+
+        // 彩蛋功能
+        document.getElementById('eggTrigger').addEventListener('click', function(e) {
+            e.stopPropagation(); // 阻止事件冒泡，避免触发页面切换
+            alert('🎉 彩蛋：祝你生日快乐，天天开心！🎂');
+        });
+
+        // 页面3及以后，点击页面任意位置切换或显示下一张卡片
+        for (let i = 3; i <= totalPages; i++) {
+            document.querySelector(`.page-${i}`).addEventListener('click', function(e) {
+                // 如果点击的是卡片导航点，不处理页面切换
+                if (e.target.classList.contains('card-dot')) {
+                    const cardIndex = parseInt(e.target.dataset.index);
+                    showCard(i, cardIndex);
+                    return;
+                }
+                
+                // 如果点击的是彩蛋，不处理页面切换
+                if (e.target.classList.contains('egg')) {
+                    return;
+                }
+                
+                // 尝试显示下一张卡片，如果没有更多卡片则切换页面
+                if (i <= 7 && showNextCard(i)) {
+                    // 还有更多卡片，不切换页面
+                } else {
+                    switchPage();
+                }
+            });
+        }
+        
+        // 添加键盘支持
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                // 如果当前页面有卡片，先尝试显示下一张卡片
+                if (currentPage >= 3 && currentPage <= 7) {
+                    if (!showNextCard(currentPage)) {
+                        switchPage();
+                    }
+                } else {
+                    switchPage();
+                }
+            } else if (e.key === 'ArrowLeft' && currentPage >= 3 && currentPage <= 7) {
+                // 左箭头显示上一张卡片
+                const state = cardStates[currentPage];
+                if (state.currentIndex > 0) {
+                    showCard(currentPage, state.currentIndex - 1);
+                }
+            }
+        });
+        
+        // 初始化卡片状态
+        initCardStates();
+    </script>
+</body>
+</html>
